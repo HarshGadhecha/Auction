@@ -1,51 +1,154 @@
-# Welcome to your Expo app 👋
+# Auction - Real-Time Sports Player Auction App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**Turn Every Sports Draft Into An Epic Live Auction Experience**
 
-## Get started
+Real-time sports player auctions. Build teams, bid live, manage tournaments.
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## 📱 About
 
-2. Start the app
+Auction is a comprehensive mobile auction management app built with React Native (Expo Router) for iOS and Android. It enables organizers to create thrilling real-time player auctions with multiple bidding formats, team management, and live spectator engagement.
 
-   ```bash
-   npx expo start
-   ```
+### Key Features
 
-In the output, you'll find options to open the app in a
+- ⚡ **Multiple Auction Types**
+  - Player Auction: Teams bid on individual players
+  - Team Auction: Teams bid for picks, then select players
+  - Number-wise: Organized round-robin player selection
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- 🎯 **Core Features**
+  - Real-time bidding with live updates across all devices
+  - Smart team & budget management with credit allocation
+  - Referral-based spectator access
+  - Multiple sports support (Cricket, Football, Basketball, etc.)
+  - Offline mode support
+  - Push notifications for auction reminders
+  - Professional tournament analytics
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- 👥 **Built For**
+  - Fantasy leagues, Corporate tournaments
+  - School competitions, Professional sports drafts
 
-## Get a fresh project
+## 🏗️ Tech Stack
 
-When you're ready, run:
+- **Framework:** React Native (Expo SDK 54)
+- **Navigation:** Expo Router v6
+- **Language:** TypeScript
+- **Backend:** Firebase (Auth, Realtime DB, Storage, Analytics)
+- **Authentication:** Google & Apple Sign-In
+- **Offline Storage:** SQLite
+- **Animations:** Reanimated 4, Lottie
+- **Notifications:** Expo Notifications (FCM + APNs)
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+
+- Expo CLI: `npm install -g expo-cli`
+- Firebase account
+- Google/Apple Developer accounts for authentication
+
+### Installation
 
 ```bash
-npm run reset-project
+# Install dependencies
+npm install
+
+# Configure Firebase
+# Update services/firebase.config.ts with your credentials
+
+# Start development server
+npm start
+
+# Run on device
+npm run ios      # iOS (Mac only)
+npm run android  # Android
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Firebase Setup
 
-## Learn more
+1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com/)
+2. Enable Authentication (Google & Apple)
+3. Create Realtime Database
+4. Set up Storage bucket
+5. Copy config to `services/firebase.config.ts`
 
-To learn more about developing your project with Expo, look at the following resources:
+See `SETUP.md` for detailed configuration instructions.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## 📂 Project Structure
 
-## Join the community
+```
+auction/
+├── app/                    # Expo Router screens
+│   ├── (tabs)/            # Dashboard, Search, Settings
+│   ├── auction/           # Auction CRUD & live bidding
+│   └── auth.tsx           # Authentication
+├── services/              # Firebase services
+├── contexts/              # React contexts (Auth, Theme)
+├── types/                 # TypeScript definitions
+└── utils/                 # Helper functions
+```
 
-Join our community of developers creating universal apps.
+## 🎮 Quick Guide
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-# Auction
+### Create an Auction
+1. Tap "+" button on Dashboard
+2. Fill auction details (name, date, venue, credits, etc.)
+3. Choose auction type (Player/Team/Number-wise)
+4. Add image (optional)
+
+### Add Teams & Players
+1. Open auction → Teams/Players tab
+2. Tap "Add Team" or "Add Player"
+3. Fill details and upload images
+
+### Start Bidding
+1. Ensure minimum requirements met
+2. Tap "Start" → Begin live auction
+3. Teams bid in real-time
+4. Mark players as Sold/Unsold
+
+## 🏗️ Development Phases
+
+### ✅ Phase 1 - Foundation (Complete)
+- Firebase integration
+- Google & Apple authentication
+- Navigation & theme support
+
+### ✅ Phase 2 - Core Features (Complete)
+- Create auction flow
+- Team & player management
+- Live bidding (all 3 types)
+- Real-time sync
+- Share & referral system
+
+### ⏳ Phase 3 - Advanced (Next)
+- In-app purchases
+- Push notifications
+- PDF reports
+- Offline support
+- Animations
+
+## 🐛 Troubleshooting
+
+**Firebase errors?**
+- Verify credentials in `services/firebase.config.ts`
+
+**Build issues?**
+```bash
+rm -rf node_modules && npm install
+npx expo start --clear
+```
+
+**Auth not working?**
+- Check OAuth client IDs
+- Verify bundle identifiers match
+
+## 📄 License
+
+Proprietary - All rights reserved
+
+---
+
+Made with ❤️ for sports enthusiasts | Version 1.0.0
