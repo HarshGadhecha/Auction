@@ -16,6 +16,9 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.yourcompany.auction",
+      "associatedDomains": [
+        "applinks:auction.yourcompany.com"
+      ],
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "This app needs access to your photos to upload auction images.",
         "NSCameraUsageDescription": "This app needs access to your camera to take auction photos."
@@ -35,6 +38,23 @@
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "auction.yourcompany.com",
+              "pathPrefix": "/auction"
+            },
+            {
+              "scheme": "auction"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
       ]
     },
     "web": {

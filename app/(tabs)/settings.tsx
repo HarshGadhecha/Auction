@@ -9,12 +9,14 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import Colors from '@/constants/Colors';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 
 export default function SettingsScreen() {
+  const router = useRouter();
   const { user, signOut, hasSubscription } = useAuth();
   const { theme, setTheme, isDark } = useTheme();
 
@@ -99,20 +101,18 @@ export default function SettingsScreen() {
           ACCOUNT
         </Text>
 
-        {!hasSubscription && (
-          <TouchableOpacity
-            style={[styles.settingItem, { backgroundColor: colors.card }]}
-            onPress={() => Alert.alert('Subscription', 'Subscription feature coming soon!')}
-          >
-            <View style={styles.settingInfo}>
-              <IconSymbol name="crown.fill" size={24} color={colors.warning} />
-              <Text style={[styles.settingLabel, { color: colors.text }]}>
-                Upgrade to Premium
-              </Text>
-            </View>
-            <IconSymbol name="chevron.right" size={20} color={colors.textSecondary} />
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity
+          style={[styles.settingItem, { backgroundColor: colors.card }]}
+          onPress={() => router.push('/subscription')}
+        >
+          <View style={styles.settingInfo}>
+            <IconSymbol name="crown.fill" size={24} color={colors.warning} />
+            <Text style={[styles.settingLabel, { color: colors.text }]}>
+              {hasSubscription ? 'Manage Subscription' : 'Upgrade to Premium'}
+            </Text>
+          </View>
+          <IconSymbol name="chevron.right" size={20} color={colors.textSecondary} />
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.settingItem, { backgroundColor: colors.card }]}
