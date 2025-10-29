@@ -17,6 +17,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import Colors, { TeamColors } from '@/constants/Colors';
 import auctionService from '@/services/auction.service';
+import pdfService from '@/services/pdf.service';
 import { Auction, Team, Player, AddTeamInput, AddPlayerInput } from '@/types';
 import { formatDateTime, canStartAuction, generateShareMessage, canAddTeam } from '@/utils/helpers';
 import { IconSymbol } from '@/components/ui/icon-symbol';
@@ -247,6 +248,20 @@ export default function AuctionDetailsScreen() {
     );
   };
 
+  const handleGenerateReport = async () => {
+    if (!auction) return;
+
+    try {
+      setLoading(true);
+      await pdfService.generateAndShare(auction);
+    } catch (error) {
+      console.error('Generate report error:', error);
+      Alert.alert('Error', 'Failed to generate report');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading || !auction) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -333,6 +348,26 @@ export default function AuctionDetailsScreen() {
             >
               <IconSymbol name="trash" size={20} color="#FFFFFF" />
               <Text style={styles.actionButtonText}>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Completed Auction Actions */}
+        {isOwner && auction.status === 'completed' && (
+          <View style={styles.actionButtons}>
+            <TouchableOpacity
+              style={[styles.actionButton, { backgroundColor: colors.primary }]}
+              onPress={handleGenerateReport}
+            >
+              <IconSymbol name="doc.fill" size={20} color="#FFFFFF" />
+              <Text style={styles.actionButtonText}>Generate Report</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.actionButton, { backgroundColor: colors.textSecondary }]}
+              onPress={handleShare}
+            >
+              <IconSymbol name="square.and.arrow.up" size={20} color="#FFFFFF" />
+              <Text style={styles.actionButtonText}>Share</Text>
             </TouchableOpacity>
           </View>
         )}
