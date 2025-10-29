@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1093753986541",
+    "firebase_url": "https://auctionx-512cf-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "auctionx-512cf",
+    "storage_bucket": "auctionx-512cf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1093753986541:android:264a4985a2631b51a9dbe4",
+        "android_client_info": {
+          "package_name": "com.app.auctionx"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1093753986541-4ulj4vvec8k8brjchrosutviucmig7vt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAoEobMKHcHMMf2NFCWnr8Zot3zkNATlvU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1093753986541-4ulj4vvec8k8brjchrosutviucmig7vt.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1093753986541-pp38j1uiaeljs4s8rb1neq7597v5qfd1.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "AuctionX"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
