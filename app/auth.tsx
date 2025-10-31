@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Platform,
-  Alert,
-} from 'react-native';
+import Colors from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import Colors from '@/constants/Colors';
+import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
 import * as AppleAuthentication from 'expo-apple-authentication';
+import React, { useState } from 'react';
+import {
+  Alert,
+  Image,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 export default function AuthScreen() {
   const { signInWithGoogle, signInWithApple } = useAuth();
@@ -70,10 +71,17 @@ export default function AuthScreen() {
             onPress={handleGoogleSignIn}
             disabled={loading}
           >
-            <Image
+            <GoogleSigninButton
+              size={GoogleSigninButton.Size.Wide}
+              color={GoogleSigninButton.Color.Dark}
+              onPress={() => {
+                // initiate sign in
+              }}
+            />
+            {/* <Image
               source={require('@/assets/images/google-icon.png')}
               style={styles.buttonIcon}
-            />
+            /> */}
             <Text style={styles.googleButtonText}>Continue with Google</Text>
           </TouchableOpacity>
 
