@@ -15,9 +15,9 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yourcompany.auction",
+      "bundleIdentifier": "com.harsh-gadhecha.auction",
       "associatedDomains": [
-        "applinks:auction.yourcompany.com"
+        "applinks:auction.harsh-gadhecha.com"
       ],
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "This app needs access to your photos to upload auction images.",
@@ -25,7 +25,7 @@
       }
     },
     "android": {
-      "package": "com.yourcompany.auction",
+      "package": "com.harsh_gadhecha.auction",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
