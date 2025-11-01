@@ -1,3 +1,4 @@
+import { CustomHeader } from '@/components/custom-header';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import Colors from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
@@ -141,7 +142,10 @@ export default function CreateAuctionScreen() {
 
   const handleCreate = async () => {
     if (!validateForm()) return;
-    if (!user) return;
+    if (!user) {
+      Alert.alert('Error', 'You must be logged in to create an auction');
+      return;
+    }
 
     try {
       setLoading(true);
@@ -149,11 +153,14 @@ export default function CreateAuctionScreen() {
       // Upload image if selected
       let imageUrl = undefined;
       if (imageUri) {
+        console.log('Uploading image...');
         const imagePath = `auctions/${user.uid}/${Date.now()}.jpg`;
         imageUrl = await auctionService.uploadImage(imageUri, imagePath);
+        console.log('Image uploaded successfully:', imageUrl);
       }
 
       // Create auction
+      console.log('Creating auction with data:', formData);
       const auctionId = await auctionService.createAuction(
         user.uid,
         user.displayName || 'Unknown',
@@ -162,6 +169,7 @@ export default function CreateAuctionScreen() {
           imageUrl,
         }
       );
+      console.log('Auction created successfully with ID:', auctionId);
 
       Alert.alert('Success', 'Auction created successfully!', [
         {
@@ -169,9 +177,10 @@ export default function CreateAuctionScreen() {
           onPress: () => router.replace(`/auction/${auctionId}`),
         },
       ]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Create auction error:', error);
-      Alert.alert('Error', 'Failed to create auction');
+      const errorMessage = error?.message || 'Failed to create auction. Please check your internet connection and try again.';
+      Alert.alert('Error', errorMessage);
     } finally {
       setLoading(false);
     }
@@ -180,10 +189,17 @@ export default function CreateAuctionScreen() {
   const auctionDate = new Date(formData.auctionDate);
 
   return (
-    <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
-      contentContainerStyle={styles.content}
-    >
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <CustomHeader
+        title="Create Auction"
+        subtitle="Set up your auction details"
+        showBackButton={true}
+      />
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
       {/* Image Picker */}
       <TouchableOpacity style={styles.imagePicker} onPress={handlePickImage}>
         {imageUri ? (
@@ -377,14 +393,16 @@ export default function CreateAuctionScreen() {
           {loading ? 'Creating...' : 'Create Auction'}
         </Text>
       </TouchableOpacity>
-
-
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  scrollView: {
     flex: 1,
   },
   content: {
