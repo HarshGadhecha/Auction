@@ -257,7 +257,7 @@ class AuctionService {
       const team: Team = teamSnapshot.val();
 
       await update(teamRef, {
-        players: [...team.players, playerId],
+        players: [...(team.players || []), playerId],
         remainingCredits: team.remainingCredits - finalPrice,
       });
 
