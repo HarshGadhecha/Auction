@@ -23,6 +23,7 @@ import {
   BidAction
 } from '@/types';
 import { generateReferralCode } from '@/utils/helpers';
+import { getDefaultImagePath } from '@/constants/DefaultImages';
 
 class AuctionService {
   // Create a new auction
@@ -179,6 +180,26 @@ class AuctionService {
     }
   }
 
+  // Update team
+  async updateTeam(auctionId: string, teamId: string, updates: Partial<AddTeamInput>): Promise<void> {
+    try {
+      await update(ref(database, `auctions/${auctionId}/teams/${teamId}`), updates);
+    } catch (error) {
+      console.error('Update Team Error:', error);
+      throw error;
+    }
+  }
+
+  // Delete team
+  async deleteTeam(auctionId: string, teamId: string): Promise<void> {
+    try {
+      await remove(ref(database, `auctions/${auctionId}/teams/${teamId}`));
+    } catch (error) {
+      console.error('Delete Team Error:', error);
+      throw error;
+    }
+  }
+
   // Add player to auction
   async addPlayer(auctionId: string, playerInput: AddPlayerInput): Promise<string> {
     try {
@@ -200,6 +221,26 @@ class AuctionService {
       return playerId;
     } catch (error) {
       console.error('Add Player Error:', error);
+      throw error;
+    }
+  }
+
+  // Update player
+  async updatePlayer(auctionId: string, playerId: string, updates: Partial<AddPlayerInput>): Promise<void> {
+    try {
+      await update(ref(database, `auctions/${auctionId}/players/${playerId}`), updates);
+    } catch (error) {
+      console.error('Update Player Error:', error);
+      throw error;
+    }
+  }
+
+  // Delete player
+  async deletePlayer(auctionId: string, playerId: string): Promise<void> {
+    try {
+      await remove(ref(database, `auctions/${auctionId}/players/${playerId}`));
+    } catch (error) {
+      console.error('Delete Player Error:', error);
       throw error;
     }
   }
@@ -311,6 +352,26 @@ class AuctionService {
     } catch (error) {
       console.error('Complete Auction Error:', error);
       throw error;
+    }
+  }
+
+  // Get default image URL from Firebase Storage
+  async getDefaultImageUrl(type: 'tournament' | 'team' | 'player'): Promise<string | undefined> {
+    try {
+      // Check if storage is initialized
+      if (!storage) {
+        console.warn('Firebase Storage is not configured. Default images will not be available.');
+        return undefined;
+      }
+
+      const imagePath = getDefaultImagePath(type);
+      const imageRef = storageRef(storage, imagePath);
+      const downloadURL = await getDownloadURL(imageRef);
+      return downloadURL;
+    } catch (error: any) {
+      console.error(`Failed to get default ${type} image:`, error);
+      // Return undefined if default image is not found - the UI will handle the placeholder
+      return undefined;
     }
   }
 

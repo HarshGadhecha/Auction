@@ -77,7 +77,7 @@ export default function CreateAuctionScreen() {
   const handlePickImage = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: [ImagePicker.MediaType.Images],
         allowsEditing: true,
         aspect: [16, 9],
         quality: 0.8,
@@ -150,7 +150,7 @@ export default function CreateAuctionScreen() {
     try {
       setLoading(true);
 
-      // Upload image if selected
+      // Upload image if selected, otherwise use default image
       let imageUrl = undefined;
       if (imageUri) {
         try {
@@ -165,7 +165,7 @@ export default function CreateAuctionScreen() {
           const continueWithoutImage = await new Promise<boolean>((resolve) => {
             Alert.alert(
               'Image Upload Failed',
-              `${uploadError.message || 'Failed to upload image'}\n\nWould you like to create the auction without an image?`,
+              `${uploadError.message || 'Failed to upload image'}\n\nWould you like to create the auction with a default image?`,
               [
                 {
                   text: 'Cancel',
@@ -173,7 +173,7 @@ export default function CreateAuctionScreen() {
                   style: 'cancel',
                 },
                 {
-                  text: 'Continue',
+                  text: 'Use Default',
                   onPress: () => resolve(true),
                 },
               ]
@@ -185,9 +185,13 @@ export default function CreateAuctionScreen() {
             return;
           }
 
-          // Continue without image
-          imageUrl = undefined;
+          // Try to use default image
+          imageUrl = await auctionService.getDefaultImageUrl('tournament');
         }
+      } else {
+        // No image selected, use default image
+        console.log('No image selected, using default tournament image...');
+        imageUrl = await auctionService.getDefaultImageUrl('tournament');
       }
 
       // Create auction
