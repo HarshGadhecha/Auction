@@ -8,6 +8,7 @@ import {
 } from 'firebase/auth';
 import * as Google from 'expo-auth-session/providers/google';
 import * as AppleAuthentication from 'expo-apple-authentication';
+import * as Crypto from 'expo-crypto';
 import { auth, database } from './firebase';
 import { ref, set, get, update } from 'firebase/database';
 import { User } from '@/types';
@@ -43,11 +44,27 @@ class AuthService {
   // Apple Sign-In
   async signInWithApple(): Promise<User | null> {
     try {
+      // Generate nonce for security
+      const nonce = Math.random().toString(36).substring(2, 10);
+      const hashedNonce = await Crypto.digestStringAsync(
+        Crypto.CryptoDigestAlgorithm.SHA256,
+        nonce
+      );
+
+      console.log('[AuthService] Starting Apple Sign-In with nonce');
+
       const credential = await AppleAuthentication.signInAsync({
         requestedScopes: [
           AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
           AppleAuthentication.AppleAuthenticationScope.EMAIL,
         ],
+        nonce: hashedNonce,
+      });
+
+      console.log('[AuthService] Apple credential received:', {
+        user: credential.user,
+        email: credential.email,
+        hasIdentityToken: !!credential.identityToken,
       });
 
       const { identityToken } = credential;
@@ -55,15 +72,20 @@ class AuthService {
         throw new Error('No identity token returned from Apple');
       }
 
+      // Create Firebase credential with the identity token and nonce
       const provider = new OAuthProvider('apple.com');
       const authCredential = provider.credential({
         idToken: identityToken,
+        rawNonce: nonce,
       });
 
+      console.log('[AuthService] Signing in with Firebase credential');
       const userCredential = await signInWithCredential(auth, authCredential);
+      console.log('[AuthService] Firebase sign-in successful, user:', userCredential.user.uid);
+
       return await this.createOrUpdateUser(userCredential.user, 'apple');
     } catch (error) {
-      console.error('Apple Sign-In Error:', error);
+      console.error('[AuthService] Apple Sign-In Error:', error);
       throw error;
     }
   }
