@@ -66,9 +66,33 @@ Go to Firebase Console → Realtime Database → Rules and paste the following:
 }
 ```
 
+### Enable Firebase Storage
+
+**IMPORTANT:** Before using image uploads, you must enable Firebase Storage:
+
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Select your project
+3. Navigate to **Build → Storage** in the left sidebar
+4. Click **Get Started**
+5. Choose **Start in production mode** (we'll configure rules next)
+6. Select your Cloud Storage location (choose one close to your users)
+7. Click **Done**
+
+Your storage bucket will be created with a URL like: `your-project-id.appspot.com`
+
+### Verify Environment Variables
+
+Ensure your `.env` file has the correct storage bucket:
+
+```env
+FIREBASE_STORAGE_BUCKET=your-project-id.appspot.com
+```
+
+⚠️ **Note:** If `FIREBASE_STORAGE_BUCKET` is empty or incorrect, image uploads will fail with a "storage/unknown" error.
+
 ### Storage Rules
 
-Go to Firebase Console → Storage → Rules and paste the following:
+After enabling Storage, go to Firebase Console → Storage → Rules and paste the following:
 
 ```
 rules_version = '2';
@@ -472,10 +496,16 @@ EXPO_PROJECT_ID=your_expo_project_id
 - Check APNs/FCM configuration
 - Test with Firebase Console first
 
-**Storage upload fails:**
-- Check file size limits
-- Verify content type
-- Check user permissions
+**Storage upload fails (`storage/unknown` error):**
+- **Most common cause:** Firebase Storage is not enabled in Firebase Console
+  - Go to Firebase Console → Build → Storage and click "Get Started"
+- Verify `FIREBASE_STORAGE_BUCKET` is set correctly in `.env` file
+- Check that the storage bucket exists (should be `your-project-id.appspot.com`)
+- Ensure Storage Rules are published (see Storage Rules section above)
+- Verify you're authenticated before uploading
+- Check file size limits (5MB for auction images)
+- Verify content type is an image (`image/*`)
+- Check user permissions in Storage Rules
 
 ---
 

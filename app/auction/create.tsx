@@ -153,10 +153,41 @@ export default function CreateAuctionScreen() {
       // Upload image if selected
       let imageUrl = undefined;
       if (imageUri) {
-        console.log('Uploading image...');
-        const imagePath = `auctions/${user.uid}/${Date.now()}.jpg`;
-        imageUrl = await auctionService.uploadImage(imageUri, imagePath);
-        console.log('Image uploaded successfully:', imageUrl);
+        try {
+          console.log('Uploading image...');
+          const imagePath = `auctions/${user.uid}/${Date.now()}.jpg`;
+          imageUrl = await auctionService.uploadImage(imageUri, imagePath);
+          console.log('Image uploaded successfully:', imageUrl);
+        } catch (uploadError: any) {
+          console.error('Image upload error:', uploadError);
+
+          // Ask user if they want to continue without image
+          const continueWithoutImage = await new Promise<boolean>((resolve) => {
+            Alert.alert(
+              'Image Upload Failed',
+              `${uploadError.message || 'Failed to upload image'}\n\nWould you like to create the auction without an image?`,
+              [
+                {
+                  text: 'Cancel',
+                  onPress: () => resolve(false),
+                  style: 'cancel',
+                },
+                {
+                  text: 'Continue',
+                  onPress: () => resolve(true),
+                },
+              ]
+            );
+          });
+
+          if (!continueWithoutImage) {
+            setLoading(false);
+            return;
+          }
+
+          // Continue without image
+          imageUrl = undefined;
+        }
       }
 
       // Create auction

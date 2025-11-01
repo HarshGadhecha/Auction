@@ -317,16 +317,49 @@ class AuctionService {
   // Upload image
   async uploadImage(uri: string, path: string): Promise<string> {
     try {
+      // Check if storage is initialized
+      if (!storage) {
+        throw new Error(
+          'Firebase Storage is not configured. Please enable Firebase Storage in the Firebase Console and ensure FIREBASE_STORAGE_BUCKET is set in your environment variables.'
+        );
+      }
+
       const response = await fetch(uri);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.statusText}`);
+      }
+
       const blob = await response.blob();
+
+      // Validate blob
+      if (!blob || blob.size === 0) {
+        throw new Error('Invalid image data');
+      }
 
       const imageRef = storageRef(storage, path);
       await uploadBytes(imageRef, blob);
 
       const downloadURL = await getDownloadURL(imageRef);
       return downloadURL;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Upload Image Error:', error);
+
+      // Provide more helpful error messages
+      if (error.code === 'storage/unknown') {
+        throw new Error(
+          'Firebase Storage error. Please ensure:\n' +
+          '1. Firebase Storage is enabled in Firebase Console\n' +
+          '2. Storage rules are properly configured\n' +
+          '3. Storage bucket name is correct in your configuration'
+        );
+      } else if (error.code === 'storage/unauthorized') {
+        throw new Error('You do not have permission to upload images. Please check Firebase Storage rules.');
+      } else if (error.code === 'storage/canceled') {
+        throw new Error('Image upload was canceled');
+      } else if (error.code === 'storage/retry-limit-exceeded') {
+        throw new Error('Upload failed due to network issues. Please check your connection and try again.');
+      }
+
       throw error;
     }
   }
