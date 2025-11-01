@@ -1,27 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Image,
-  Alert,
-  Modal,
-  TextInput,
-  FlatList,
-  Share,
-} from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import Colors, { TeamColors } from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import Colors, { TeamColors } from '@/constants/Colors';
 import auctionService from '@/services/auction.service';
 import pdfService from '@/services/pdf.service';
-import { Auction, Team, Player, AddTeamInput, AddPlayerInput } from '@/types';
-import { formatDateTime, canStartAuction, generateShareMessage, canAddTeam } from '@/utils/helpers';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import { AddPlayerInput, AddTeamInput, Auction, Player, Team } from '@/types';
+import { canAddTeam, canStartAuction, formatDateTime, generateShareMessage } from '@/utils/helpers';
 import * as ImagePicker from 'expo-image-picker';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import {
+  Alert,
+  Image,
+  Modal,
+  ScrollView,
+  Share,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
 
 type TabType = 'teams' | 'players';
 
@@ -189,7 +188,7 @@ export default function AuctionDetailsScreen() {
   const handlePickImage = async (type: 'team' | 'player') => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: [ImagePicker.MediaType.Images],
+        mediaTypes: ['images'],
         allowsEditing: true,
         aspect: [1, 1],
         quality: 0.8,

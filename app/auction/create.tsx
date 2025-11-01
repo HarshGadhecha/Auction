@@ -59,7 +59,7 @@ export default function CreateAuctionScreen() {
     auctionType: 'playerBid',
     totalCreditsPerTeam: 1000,
     playersPerTeam: 11,
-    minBidIncrement: 10,
+    minBidIncrement: 100,
     auctionDate: Date.now() + 24 * 60 * 60 * 1000, // Tomorrow
     venue: '',
     imageUrl: undefined,
@@ -77,7 +77,7 @@ export default function CreateAuctionScreen() {
   const handlePickImage = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: [ImagePicker.MediaType.Images],
+        mediaTypes: ['images'],
         allowsEditing: true,
         aspect: [16, 9],
         quality: 0.8,
@@ -113,6 +113,11 @@ export default function CreateAuctionScreen() {
   };
 
   const validateForm = (): boolean => {
+    if (!formData.imageUrl) {
+      Alert.alert('Error', 'Please select an auction image');
+      //select default image
+      return false;
+    }
     if (!formData.auctionName.trim()) {
       Alert.alert('Error', 'Please enter auction name');
       return false;
