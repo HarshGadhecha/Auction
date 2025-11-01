@@ -7,9 +7,9 @@
  */
 
 export const DEFAULT_IMAGE_PATHS = {
-  TOURNAMENT: 'Tournament.png',
-  TEAM: 'Team.png',
-  PLAYER: 'Player.png',
+  TOURNAMENT: 'images/Tournament.png',
+  TEAM: 'images/Team.png',
+  PLAYER: 'images/Player.png',
 };
 
 /**

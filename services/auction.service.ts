@@ -1,29 +1,29 @@
-import { database, storage } from './firebase';
+import { getDefaultImagePath } from '@/constants/DefaultImages';
 import {
-  ref,
-  push,
-  set,
-  get,
-  update,
-  remove,
-  onValue,
-  off,
-  query,
-  orderByChild,
-  equalTo
-} from 'firebase/database';
-import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import {
-  Auction,
-  CreateAuctionInput,
-  AddTeamInput,
   AddPlayerInput,
+  AddTeamInput,
+  Auction,
+  BidAction,
+  CreateAuctionInput,
   Player,
-  Team,
-  BidAction
+  Team
 } from '@/types';
 import { generateReferralCode } from '@/utils/helpers';
-import { getDefaultImagePath } from '@/constants/DefaultImages';
+import {
+  equalTo,
+  get,
+  off,
+  onValue,
+  orderByChild,
+  push,
+  query,
+  ref,
+  remove,
+  set,
+  update
+} from 'firebase/database';
+import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage';
+import { database, storage } from './firebase';
 
 class AuctionService {
   // Create a new auction
