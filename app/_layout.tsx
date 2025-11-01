@@ -34,7 +34,7 @@ function RootLayoutNav() {
           <>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen name="auction/[id]" options={{ headerShown: true, title: 'Auction Details' }} />
-            <Stack.Screen name="auction/create" options={{ headerShown: true, title: 'Create Auction' }} />
+            <Stack.Screen name="auction/create" options={{ headerShown: false }} />
             <Stack.Screen name="auction/live/[id]" options={{ headerShown: false, presentation: 'fullScreenModal' }} />
             <Stack.Screen name="subscription" options={{ headerShown: true, title: 'Premium Subscription', presentation: 'modal' }} />
           </>
