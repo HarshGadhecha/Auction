@@ -1,11 +1,11 @@
 import Colors from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import React, { useState } from 'react';
 import {
   Alert,
+  ActivityIndicator,
   Image,
   Platform,
   StyleSheet,
@@ -71,18 +71,16 @@ export default function AuthScreen() {
             onPress={handleGoogleSignIn}
             disabled={loading}
           >
-            <GoogleSigninButton
-              size={GoogleSigninButton.Size.Wide}
-              color={GoogleSigninButton.Color.Dark}
-              onPress={() => {
-                // initiate sign in
-              }}
-            />
-            {/* <Image
-              source={require('@/assets/images/google-icon.png')}
-              style={styles.buttonIcon}
-            /> */}
-            <Text style={styles.googleButtonText}>Continue with Google</Text>
+            {loading ? (
+              <ActivityIndicator color="#1F1F1F" />
+            ) : (
+              <>
+                <View style={styles.googleIcon}>
+                  <Text style={styles.googleIconText}>G</Text>
+                </View>
+                <Text style={styles.googleButtonText}>Continue with Google</Text>
+              </>
+            )}
           </TouchableOpacity>
 
           {/* Apple Sign-In (iOS only) */}
@@ -155,6 +153,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#DADCE0',
+  },
+  googleIcon: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#4285F4',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  googleIconText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
   },
   googleButtonText: {
     fontSize: 16,
