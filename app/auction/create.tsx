@@ -77,7 +77,7 @@ export default function CreateAuctionScreen() {
   const handlePickImage = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: 'images',
         allowsEditing: true,
         aspect: [16, 9],
         quality: 0.8,
@@ -236,202 +236,202 @@ export default function CreateAuctionScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-      {/* Image Picker */}
-      <TouchableOpacity style={styles.imagePicker} onPress={handlePickImage}>
-        {imageUri ? (
-          <Image source={{ uri: imageUri }} style={styles.imagePreview} />
-        ) : (
-          <View style={[styles.imagePlaceholder, { backgroundColor: colors.surface }]}>
-            <IconSymbol name="photo" size={40} color={colors.textSecondary} />
-            <Text style={[styles.imagePlaceholderText, { color: colors.textSecondary }]}>
-              Add Auction Image (Optional)
-            </Text>
-            <Text style={[styles.imageHintText, { color: colors.textSecondary }]}>
-              Tap to upload or skip to use default
-            </Text>
+        {/* Image Picker */}
+        <TouchableOpacity style={styles.imagePicker} onPress={handlePickImage}>
+          {imageUri ? (
+            <Image source={{ uri: imageUri }} style={styles.imagePreview} />
+          ) : (
+            <View style={[styles.imagePlaceholder, { backgroundColor: colors.surface }]}>
+              <IconSymbol name="photo" size={40} color={colors.textSecondary} />
+              <Text style={[styles.imagePlaceholderText, { color: colors.textSecondary }]}>
+                Add Auction Image (Optional)
+              </Text>
+              <Text style={[styles.imageHintText, { color: colors.textSecondary }]}>
+                Tap to upload or skip to use default
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
+
+        {/* Auction Name */}
+        <View style={styles.inputGroup}>
+          <Text style={[styles.label, { color: colors.text }]}>Auction Name *</Text>
+          <TextInput
+            style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
+            placeholder="Enter auction name"
+            placeholderTextColor={colors.placeholder}
+            value={formData.auctionName}
+            onChangeText={(text) => updateFormData('auctionName', text)}
+          />
+        </View>
+
+        {/* Sport Type */}
+        <View style={styles.inputGroup}>
+          <Text style={[styles.label, { color: colors.text }]}>Sport Type *</Text>
+          <View style={styles.optionRow}>
+            {SPORT_TYPES.map((sport) => (
+              <TouchableOpacity
+                key={sport.value}
+                style={[
+                  styles.optionButton,
+                  { borderColor: colors.border },
+                  formData.sportType === sport.value && {
+                    backgroundColor: colors.primary,
+                    borderColor: colors.primary,
+                  },
+                ]}
+                onPress={() => updateFormData('sportType', sport.value)}
+              >
+                <Text
+                  style={[
+                    styles.optionText,
+                    { color: formData.sportType === sport.value ? '#FFFFFF' : colors.text },
+                  ]}
+                >
+                  {sport.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
-        )}
-      </TouchableOpacity>
+        </View>
 
-      {/* Auction Name */}
-      <View style={styles.inputGroup}>
-        <Text style={[styles.label, { color: colors.text }]}>Auction Name *</Text>
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
-          placeholder="Enter auction name"
-          placeholderTextColor={colors.placeholder}
-          value={formData.auctionName}
-          onChangeText={(text) => updateFormData('auctionName', text)}
-        />
-      </View>
-
-      {/* Sport Type */}
-      <View style={styles.inputGroup}>
-        <Text style={[styles.label, { color: colors.text }]}>Sport Type *</Text>
-        <View style={styles.optionRow}>
-          {SPORT_TYPES.map((sport) => (
+        {/* Auction Type */}
+        <View style={styles.inputGroup}>
+          <Text style={[styles.label, { color: colors.text }]}>Auction Type *</Text>
+          {AUCTION_TYPES.map((type) => (
             <TouchableOpacity
-              key={sport.value}
+              key={type.value}
               style={[
-                styles.optionButton,
-                { borderColor: colors.border },
-                formData.sportType === sport.value && {
-                  backgroundColor: colors.primary,
+                styles.auctionTypeCard,
+                { backgroundColor: colors.surface, borderColor: colors.border },
+                formData.auctionType === type.value && {
+                  backgroundColor: colors.primary + '10',
                   borderColor: colors.primary,
+                  borderWidth: 2,
                 },
               ]}
-              onPress={() => updateFormData('sportType', sport.value)}
+              onPress={() => updateFormData('auctionType', type.value)}
             >
-              <Text
-                style={[
-                  styles.optionText,
-                  { color: formData.sportType === sport.value ? '#FFFFFF' : colors.text },
-                ]}
-              >
-                {sport.label}
-              </Text>
+              <View style={styles.auctionTypeContent}>
+                <Text style={[styles.auctionTypeLabel, { color: colors.text }]}>
+                  {type.label}
+                </Text>
+                <Text style={[styles.auctionTypeDesc, { color: colors.textSecondary }]}>
+                  {type.description}
+                </Text>
+              </View>
+              {formData.auctionType === type.value && (
+                <IconSymbol name="checkmark.circle.fill" size={24} color={colors.primary} />
+              )}
             </TouchableOpacity>
           ))}
         </View>
-      </View>
 
-      {/* Auction Type */}
-      <View style={styles.inputGroup}>
-        <Text style={[styles.label, { color: colors.text }]}>Auction Type *</Text>
-        {AUCTION_TYPES.map((type) => (
-          <TouchableOpacity
-            key={type.value}
-            style={[
-              styles.auctionTypeCard,
-              { backgroundColor: colors.surface, borderColor: colors.border },
-              formData.auctionType === type.value && {
-                backgroundColor: colors.primary + '10',
-                borderColor: colors.primary,
-                borderWidth: 2,
-              },
-            ]}
-            onPress={() => updateFormData('auctionType', type.value)}
-          >
-            <View style={styles.auctionTypeContent}>
-              <Text style={[styles.auctionTypeLabel, { color: colors.text }]}>
-                {type.label}
-              </Text>
-              <Text style={[styles.auctionTypeDesc, { color: colors.textSecondary }]}>
-                {type.description}
-              </Text>
-            </View>
-            {formData.auctionType === type.value && (
-              <IconSymbol name="checkmark.circle.fill" size={24} color={colors.primary} />
-            )}
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Credits Per Team */}
-      <View style={styles.inputGroup}>
-        <Text style={[styles.label, { color: colors.text }]}>Total Credits Per Team *</Text>
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
-          placeholder="e.g., 1000"
-          placeholderTextColor={colors.placeholder}
-          value={formData.totalCreditsPerTeam.toString()}
-          onChangeText={(text) => updateFormData('totalCreditsPerTeam', parseInt(text) || 0)}
-          keyboardType="numeric"
-        />
-      </View>
-
-      {/* Players Per Team */}
-      <View style={styles.inputGroup}>
-        <Text style={[styles.label, { color: colors.text }]}>Players Per Team *</Text>
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
-          placeholder="e.g., 11"
-          placeholderTextColor={colors.placeholder}
-          value={formData.playersPerTeam.toString()}
-          onChangeText={(text) => updateFormData('playersPerTeam', parseInt(text) || 0)}
-          keyboardType="numeric"
-        />
-      </View>
-
-      {/* Min Bid Increment */}
-      <View style={styles.inputGroup}>
-        <Text style={[styles.label, { color: colors.text }]}>Minimum Bid Increment *</Text>
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
-          placeholder="e.g., 10"
-          placeholderTextColor={colors.placeholder}
-          value={formData.minBidIncrement.toString()}
-          onChangeText={(text) => updateFormData('minBidIncrement', parseInt(text) || 0)}
-          keyboardType="numeric"
-        />
-      </View>
-
-      {/* Date & Time */}
-      <View style={styles.inputGroup}>
-        <Text style={[styles.label, { color: colors.text }]}>Auction Date & Time *</Text>
-        <View style={styles.dateTimeRow}>
-          <TouchableOpacity
-            style={[styles.dateTimeButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
-            onPress={() => setShowDatePicker(true)}
-          >
-            <IconSymbol name="calendar" size={20} color={colors.text} />
-            <Text style={[styles.dateTimeText, { color: colors.text }]}>
-              {auctionDate.toLocaleDateString()}
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.dateTimeButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
-            onPress={() => setShowTimePicker(true)}
-          >
-            <IconSymbol name="clock" size={20} color={colors.text} />
-            <Text style={[styles.dateTimeText, { color: colors.text }]}>
-              {auctionDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </Text>
-          </TouchableOpacity>
+        {/* Credits Per Team */}
+        <View style={styles.inputGroup}>
+          <Text style={[styles.label, { color: colors.text }]}>Total Credits Per Team *</Text>
+          <TextInput
+            style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
+            placeholder="e.g., 1000"
+            placeholderTextColor={colors.placeholder}
+            value={formData.totalCreditsPerTeam.toString()}
+            onChangeText={(text) => updateFormData('totalCreditsPerTeam', parseInt(text) || 0)}
+            keyboardType="numeric"
+          />
         </View>
-      </View>
-      {/* Date Picker Modals */}
-      {showDatePicker && (
-        <DateTimePicker
-          value={auctionDate}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={handleDateChange}
-          minimumDate={new Date()}
-        />
-      )}
 
-      {showTimePicker && (
-        <DateTimePicker
-          value={auctionDate}
-          mode="time"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={handleTimeChange}
-        />
-      )}
-      {/* Venue */}
-      <View style={styles.inputGroup}>
-        <Text style={[styles.label, { color: colors.text }]}>Venue *</Text>
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
-          placeholder="Enter venue location"
-          placeholderTextColor={colors.placeholder}
-          value={formData.venue}
-          onChangeText={(text) => updateFormData('venue', text)}
-        />
-      </View>
+        {/* Players Per Team */}
+        <View style={styles.inputGroup}>
+          <Text style={[styles.label, { color: colors.text }]}>Players Per Team *</Text>
+          <TextInput
+            style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
+            placeholder="e.g., 11"
+            placeholderTextColor={colors.placeholder}
+            value={formData.playersPerTeam.toString()}
+            onChangeText={(text) => updateFormData('playersPerTeam', parseInt(text) || 0)}
+            keyboardType="numeric"
+          />
+        </View>
 
-      {/* Create Button */}
-      <TouchableOpacity
-        style={[styles.createButton, { backgroundColor: colors.primary }]}
-        onPress={handleCreate}
-        disabled={loading}
-      >
-        <Text style={styles.createButtonText}>
-          {loading ? 'Creating...' : 'Create Auction'}
-        </Text>
-      </TouchableOpacity>
+        {/* Min Bid Increment */}
+        <View style={styles.inputGroup}>
+          <Text style={[styles.label, { color: colors.text }]}>Minimum Bid Increment *</Text>
+          <TextInput
+            style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
+            placeholder="e.g., 10"
+            placeholderTextColor={colors.placeholder}
+            value={formData.minBidIncrement.toString()}
+            onChangeText={(text) => updateFormData('minBidIncrement', parseInt(text) || 0)}
+            keyboardType="numeric"
+          />
+        </View>
+
+        {/* Date & Time */}
+        <View style={styles.inputGroup}>
+          <Text style={[styles.label, { color: colors.text }]}>Auction Date & Time *</Text>
+          <View style={styles.dateTimeRow}>
+            <TouchableOpacity
+              style={[styles.dateTimeButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+              onPress={() => setShowDatePicker(true)}
+            >
+              <IconSymbol name="calendar" size={20} color={colors.text} />
+              <Text style={[styles.dateTimeText, { color: colors.text }]}>
+                {auctionDate.toLocaleDateString()}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.dateTimeButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+              onPress={() => setShowTimePicker(true)}
+            >
+              <IconSymbol name="clock" size={20} color={colors.text} />
+              <Text style={[styles.dateTimeText, { color: colors.text }]}>
+                {auctionDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        {/* Date Picker Modals */}
+        {showDatePicker && (
+          <DateTimePicker
+            value={auctionDate}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={handleDateChange}
+            minimumDate={new Date()}
+          />
+        )}
+
+        {showTimePicker && (
+          <DateTimePicker
+            value={auctionDate}
+            mode="time"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={handleTimeChange}
+          />
+        )}
+        {/* Venue */}
+        <View style={styles.inputGroup}>
+          <Text style={[styles.label, { color: colors.text }]}>Venue *</Text>
+          <TextInput
+            style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
+            placeholder="Enter venue location"
+            placeholderTextColor={colors.placeholder}
+            value={formData.venue}
+            onChangeText={(text) => updateFormData('venue', text)}
+          />
+        </View>
+
+        {/* Create Button */}
+        <TouchableOpacity
+          style={[styles.createButton, { backgroundColor: colors.primary }]}
+          onPress={handleCreate}
+          disabled={loading}
+        >
+          <Text style={styles.createButtonText}>
+            {loading ? 'Creating...' : 'Create Auction'}
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
