@@ -208,7 +208,10 @@ export default function CreateAuctionScreen() {
           <View style={[styles.imagePlaceholder, { backgroundColor: colors.surface }]}>
             <IconSymbol name="photo" size={40} color={colors.textSecondary} />
             <Text style={[styles.imagePlaceholderText, { color: colors.textSecondary }]}>
-              Add Auction Image
+              Add Auction Image (Optional)
+            </Text>
+            <Text style={[styles.imageHintText, { color: colors.textSecondary }]}>
+              Tap to upload or skip to use default
             </Text>
           </View>
         )}
@@ -427,6 +430,12 @@ const styles = StyleSheet.create({
   imagePlaceholderText: {
     marginTop: 8,
     fontSize: 14,
+    fontWeight: '500',
+  },
+  imageHintText: {
+    marginTop: 4,
+    fontSize: 12,
+    opacity: 0.7,
   },
   inputGroup: {
     marginBottom: 20,
