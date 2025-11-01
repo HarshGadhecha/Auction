@@ -2,7 +2,8 @@ import Colors from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import * as AppleAuthentication from 'expo-apple-authentication';
-import React, { useState } from 'react';
+import { useRouter } from 'expo-router';
+import React, { useState, useEffect } from 'react';
 import {
   Alert,
   ActivityIndicator,
@@ -15,11 +16,20 @@ import {
 } from 'react-native';
 
 export default function AuthScreen() {
-  const { signInWithGoogle, signInWithApple } = useAuth();
+  const { signInWithGoogle, signInWithApple, user } = useAuth();
   const { isDark } = useTheme();
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const colors = isDark ? Colors.dark : Colors.light;
+
+  // Redirect to tabs when user is authenticated
+  useEffect(() => {
+    if (user) {
+      console.log('[AuthScreen] User authenticated, redirecting to tabs');
+      router.replace('/(tabs)');
+    }
+  }, [user, router]);
 
   const handleGoogleSignIn = async () => {
     try {
