@@ -1,24 +1,24 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  Alert,
-  Platform,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import * as ImagePicker from 'expo-image-picker';
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import Colors from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import Colors from '@/constants/Colors';
 import auctionService from '@/services/auction.service';
-import { CreateAuctionInput, SportType, AuctionType } from '@/types';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import { AuctionType, CreateAuctionInput, SportType } from '@/types';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import * as ImagePicker from 'expo-image-picker';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import {
+  Alert,
+  Image,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 const SPORT_TYPES: { label: string; value: SportType }[] = [
   { label: 'Cricket', value: 'cricket' },
@@ -312,7 +312,7 @@ export default function CreateAuctionScreen() {
       </View>
 
       {/* Date & Time */}
-      <View style={styles.inputGroup}>
+      <View style={!showDatePicker && !showTimePicker ? styles.inputGroup : {}}>
         <Text style={[styles.label, { color: colors.text }]}>Auction Date & Time *</Text>
         <View style={styles.dateTimeRow}>
           <TouchableOpacity
@@ -336,7 +336,25 @@ export default function CreateAuctionScreen() {
           </TouchableOpacity>
         </View>
       </View>
+      {/* Date Picker Modals */}
+      {showDatePicker && (
+        <DateTimePicker
+          value={auctionDate}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={handleDateChange}
+          minimumDate={new Date()}
+        />
+      )}
 
+      {showTimePicker && (
+        <DateTimePicker
+          value={auctionDate}
+          mode="time"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={handleTimeChange}
+        />
+      )}
       {/* Venue */}
       <View style={styles.inputGroup}>
         <Text style={[styles.label, { color: colors.text }]}>Venue *</Text>
@@ -360,25 +378,7 @@ export default function CreateAuctionScreen() {
         </Text>
       </TouchableOpacity>
 
-      {/* Date Picker Modals */}
-      {showDatePicker && (
-        <DateTimePicker
-          value={auctionDate}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={handleDateChange}
-          minimumDate={new Date()}
-        />
-      )}
 
-      {showTimePicker && (
-        <DateTimePicker
-          value={auctionDate}
-          mode="time"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={handleTimeChange}
-        />
-      )}
     </ScrollView>
   );
 }
