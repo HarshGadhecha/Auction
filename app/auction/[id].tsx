@@ -434,7 +434,7 @@ export default function AuctionDetailsScreen() {
                   </View>
                   <View style={styles.teamStats}>
                     <Text style={[styles.teamStatText, { color: colors.textSecondary }]}>
-                      {team.players.length} players • {team.remainingCredits} credits left
+                      {(team.players || []).length} players • {team.remainingCredits} credits left
                     </Text>
                   </View>
                 </View>
