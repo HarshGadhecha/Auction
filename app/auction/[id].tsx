@@ -37,6 +37,8 @@ export default function AuctionDetailsScreen() {
   const [activeTab, setActiveTab] = useState<TabType>('teams');
   const [showAddTeamModal, setShowAddTeamModal] = useState(false);
   const [showAddPlayerModal, setShowAddPlayerModal] = useState(false);
+  const [showEditTeamModal, setShowEditTeamModal] = useState(false);
+  const [showEditPlayerModal, setShowEditPlayerModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Team form
@@ -46,6 +48,7 @@ export default function AuctionDetailsScreen() {
     sponsorName: '',
   });
   const [teamImageUri, setTeamImageUri] = useState<string | null>(null);
+  const [editingTeamId, setEditingTeamId] = useState<string | null>(null);
 
   // Player form
   const [playerForm, setPlayerForm] = useState<AddPlayerInput>({
@@ -54,6 +57,7 @@ export default function AuctionDetailsScreen() {
     basePrice: 0,
   });
   const [playerImageUri, setPlayerImageUri] = useState<string | null>(null);
+  const [editingPlayerId, setEditingPlayerId] = useState<string | null>(null);
 
   useEffect(() => {
     loadAuction();
@@ -102,11 +106,20 @@ export default function AuctionDetailsScreen() {
     try {
       setLoading(true);
 
-      // Upload team icon if selected
+      // Upload team icon if selected, otherwise use default
       let iconUrl = undefined;
       if (teamImageUri) {
-        const imagePath = `teams/${id}/${Date.now()}.jpg`;
-        iconUrl = await auctionService.uploadImage(teamImageUri, imagePath);
+        try {
+          const imagePath = `teams/${id}/${Date.now()}.jpg`;
+          iconUrl = await auctionService.uploadImage(teamImageUri, imagePath);
+        } catch (uploadError) {
+          console.error('Team icon upload error:', uploadError);
+          // Use default image if upload fails
+          iconUrl = await auctionService.getDefaultImageUrl('team');
+        }
+      } else {
+        // No image selected, use default team image
+        iconUrl = await auctionService.getDefaultImageUrl('team');
       }
 
       await auctionService.addTeam(id as string, {
@@ -140,11 +153,20 @@ export default function AuctionDetailsScreen() {
     try {
       setLoading(true);
 
-      // Upload player image if selected
+      // Upload player image if selected, otherwise use default
       let imageUrl = undefined;
       if (playerImageUri) {
-        const imagePath = `players/${id}/${Date.now()}.jpg`;
-        imageUrl = await auctionService.uploadImage(playerImageUri, imagePath);
+        try {
+          const imagePath = `players/${id}/${Date.now()}.jpg`;
+          imageUrl = await auctionService.uploadImage(playerImageUri, imagePath);
+        } catch (uploadError) {
+          console.error('Player image upload error:', uploadError);
+          // Use default image if upload fails
+          imageUrl = await auctionService.getDefaultImageUrl('player');
+        }
+      } else {
+        // No image selected, use default player image
+        imageUrl = await auctionService.getDefaultImageUrl('player');
       }
 
       await auctionService.addPlayer(id as string, {
@@ -167,7 +189,7 @@ export default function AuctionDetailsScreen() {
   const handlePickImage = async (type: 'team' | 'player') => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: [ImagePicker.MediaType.Images],
         allowsEditing: true,
         aspect: [1, 1],
         quality: 0.8,
@@ -183,6 +205,167 @@ export default function AuctionDetailsScreen() {
     } catch (error) {
       console.error('Image picker error:', error);
     }
+  };
+
+  const handleEditTeam = (team: Team) => {
+    setEditingTeamId(team.id);
+    setTeamForm({
+      name: team.name,
+      color: team.color,
+      sponsorName: team.sponsorName || '',
+      iconUrl: team.iconUrl,
+    });
+    setTeamImageUri(team.iconUrl || null);
+    setShowEditTeamModal(true);
+  };
+
+  const handleUpdateTeam = async () => {
+    if (!teamForm.name.trim()) {
+      Alert.alert('Error', 'Please enter team name');
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // Upload new icon if selected
+      let iconUrl = teamForm.iconUrl;
+      if (teamImageUri && teamImageUri !== teamForm.iconUrl) {
+        try {
+          const imagePath = `teams/${id}/${Date.now()}.jpg`;
+          iconUrl = await auctionService.uploadImage(teamImageUri, imagePath);
+        } catch (uploadError) {
+          console.error('Team icon upload error:', uploadError);
+        }
+      }
+
+      await auctionService.updateTeam(id as string, editingTeamId!, {
+        name: teamForm.name,
+        color: teamForm.color,
+        sponsorName: teamForm.sponsorName,
+        iconUrl,
+      });
+
+      setTeamForm({ name: '', color: TeamColors[0], sponsorName: '' });
+      setTeamImageUri(null);
+      setEditingTeamId(null);
+      setShowEditTeamModal(false);
+      Alert.alert('Success', 'Team updated successfully');
+    } catch (error) {
+      console.error('Update team error:', error);
+      Alert.alert('Error', 'Failed to update team');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteTeam = (teamId: string, teamName: string) => {
+    Alert.alert(
+      'Delete Team',
+      `Are you sure you want to delete ${teamName}? This action cannot be undone.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setLoading(true);
+              await auctionService.deleteTeam(id as string, teamId);
+              Alert.alert('Success', 'Team deleted successfully');
+            } catch (error) {
+              console.error('Delete team error:', error);
+              Alert.alert('Error', 'Failed to delete team');
+            } finally {
+              setLoading(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleEditPlayer = (player: Player) => {
+    setEditingPlayerId(player.id);
+    setPlayerForm({
+      name: player.name,
+      position: player.position || '',
+      basePrice: player.basePrice,
+      imageUrl: player.imageUrl,
+    });
+    setPlayerImageUri(player.imageUrl || null);
+    setShowEditPlayerModal(true);
+  };
+
+  const handleUpdatePlayer = async () => {
+    if (!playerForm.name.trim()) {
+      Alert.alert('Error', 'Please enter player name');
+      return;
+    }
+
+    if (playerForm.basePrice < 0) {
+      Alert.alert('Error', 'Base price cannot be negative');
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // Upload new image if selected
+      let imageUrl = playerForm.imageUrl;
+      if (playerImageUri && playerImageUri !== playerForm.imageUrl) {
+        try {
+          const imagePath = `players/${id}/${Date.now()}.jpg`;
+          imageUrl = await auctionService.uploadImage(playerImageUri, imagePath);
+        } catch (uploadError) {
+          console.error('Player image upload error:', uploadError);
+        }
+      }
+
+      await auctionService.updatePlayer(id as string, editingPlayerId!, {
+        name: playerForm.name,
+        position: playerForm.position,
+        basePrice: playerForm.basePrice,
+        imageUrl,
+      });
+
+      setPlayerForm({ name: '', position: '', basePrice: 0 });
+      setPlayerImageUri(null);
+      setEditingPlayerId(null);
+      setShowEditPlayerModal(false);
+      Alert.alert('Success', 'Player updated successfully');
+    } catch (error) {
+      console.error('Update player error:', error);
+      Alert.alert('Error', 'Failed to update player');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeletePlayer = (playerId: string, playerName: string) => {
+    Alert.alert(
+      'Delete Player',
+      `Are you sure you want to delete ${playerName}? This action cannot be undone.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setLoading(true);
+              await auctionService.deletePlayer(id as string, playerId);
+              Alert.alert('Success', 'Player deleted successfully');
+            } catch (error) {
+              console.error('Delete player error:', error);
+              Alert.alert('Error', 'Failed to delete player');
+            } finally {
+              setLoading(false);
+            }
+          },
+        },
+      ]
+    );
   };
 
   const handleStartAuction = () => {
@@ -431,6 +614,22 @@ export default function AuctionDetailsScreen() {
                         </Text>
                       )}
                     </View>
+                    {isOwner && (
+                      <View style={styles.teamActions}>
+                        <TouchableOpacity
+                          onPress={() => handleEditTeam(team)}
+                          style={[styles.actionIconButton, { backgroundColor: colors.primary + '20' }]}
+                        >
+                          <IconSymbol name="pencil" size={16} color={colors.primary} />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => handleDeleteTeam(team.id, team.name)}
+                          style={[styles.actionIconButton, { backgroundColor: colors.error + '20' }]}
+                        >
+                          <IconSymbol name="trash" size={16} color={colors.error} />
+                        </TouchableOpacity>
+                      </View>
+                    )}
                   </View>
                   <View style={styles.teamStats}>
                     <Text style={[styles.teamStatText, { color: colors.textSecondary }]}>
@@ -479,6 +678,22 @@ export default function AuctionDetailsScreen() {
                       {player.status}
                     </Text>
                   </View>
+                  {isOwner && (
+                    <View style={styles.playerActions}>
+                      <TouchableOpacity
+                        onPress={() => handleEditPlayer(player)}
+                        style={[styles.actionIconButton, { backgroundColor: colors.primary + '20' }]}
+                      >
+                        <IconSymbol name="pencil" size={16} color={colors.primary} />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={() => handleDeletePlayer(player.id, player.name)}
+                        style={[styles.actionIconButton, { backgroundColor: colors.error + '20' }]}
+                      >
+                        <IconSymbol name="trash" size={16} color={colors.error} />
+                      </TouchableOpacity>
+                    </View>
+                  )}
                 </View>
               ))}
               {isOwner && (
@@ -562,6 +777,73 @@ export default function AuctionDetailsScreen() {
         </View>
       </Modal>
 
+      {/* Edit Team Modal */}
+      <Modal visible={showEditTeamModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>Edit Team</Text>
+              <TouchableOpacity onPress={() => setShowEditTeamModal(false)}>
+                <IconSymbol name="xmark" size={24} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView>
+              <TouchableOpacity style={styles.imagePicker} onPress={() => handlePickImage('team')}>
+                {teamImageUri ? (
+                  <Image source={{ uri: teamImageUri }} style={styles.imagePreview} />
+                ) : (
+                  <View style={[styles.imagePlaceholder, { backgroundColor: colors.surface }]}>
+                    <IconSymbol name="photo" size={32} color={colors.textSecondary} />
+                    <Text style={[styles.imagePlaceholderText, { color: colors.textSecondary }]}>
+                      Change Team Icon
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+
+              <TextInput
+                style={[styles.modalInput, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
+                placeholder="Team Name *"
+                placeholderTextColor={colors.placeholder}
+                value={teamForm.name}
+                onChangeText={(text) => setTeamForm({ ...teamForm, name: text })}
+              />
+
+              <TextInput
+                style={[styles.modalInput, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
+                placeholder="Sponsor Name (optional)"
+                placeholderTextColor={colors.placeholder}
+                value={teamForm.sponsorName}
+                onChangeText={(text) => setTeamForm({ ...teamForm, sponsorName: text })}
+              />
+
+              <Text style={[styles.modalLabel, { color: colors.text }]}>Team Color</Text>
+              <View style={styles.colorPicker}>
+                {TeamColors.map((color) => (
+                  <TouchableOpacity
+                    key={color}
+                    style={[
+                      styles.colorOption,
+                      { backgroundColor: color },
+                      teamForm.color === color && styles.colorOptionSelected,
+                    ]}
+                    onPress={() => setTeamForm({ ...teamForm, color })}
+                  />
+                ))}
+              </View>
+
+              <TouchableOpacity
+                style={[styles.modalButton, { backgroundColor: colors.primary }]}
+                onPress={handleUpdateTeam}
+              >
+                <Text style={styles.modalButtonText}>Update Team</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
       {/* Add Player Modal */}
       <Modal visible={showAddPlayerModal} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
@@ -617,6 +899,67 @@ export default function AuctionDetailsScreen() {
                 onPress={handleAddPlayer}
               >
                 <Text style={styles.modalButtonText}>Add Player</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Edit Player Modal */}
+      <Modal visible={showEditPlayerModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>Edit Player</Text>
+              <TouchableOpacity onPress={() => setShowEditPlayerModal(false)}>
+                <IconSymbol name="xmark" size={24} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView>
+              <TouchableOpacity style={styles.imagePicker} onPress={() => handlePickImage('player')}>
+                {playerImageUri ? (
+                  <Image source={{ uri: playerImageUri }} style={styles.imagePreview} />
+                ) : (
+                  <View style={[styles.imagePlaceholder, { backgroundColor: colors.surface }]}>
+                    <IconSymbol name="person.fill" size={32} color={colors.textSecondary} />
+                    <Text style={[styles.imagePlaceholderText, { color: colors.textSecondary }]}>
+                      Change Player Photo
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+
+              <TextInput
+                style={[styles.modalInput, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
+                placeholder="Player Name *"
+                placeholderTextColor={colors.placeholder}
+                value={playerForm.name}
+                onChangeText={(text) => setPlayerForm({ ...playerForm, name: text })}
+              />
+
+              <TextInput
+                style={[styles.modalInput, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
+                placeholder="Position (optional)"
+                placeholderTextColor={colors.placeholder}
+                value={playerForm.position}
+                onChangeText={(text) => setPlayerForm({ ...playerForm, position: text })}
+              />
+
+              <TextInput
+                style={[styles.modalInput, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
+                placeholder="Base Price *"
+                placeholderTextColor={colors.placeholder}
+                value={playerForm.basePrice.toString()}
+                onChangeText={(text) => setPlayerForm({ ...playerForm, basePrice: parseInt(text) || 0 })}
+                keyboardType="numeric"
+              />
+
+              <TouchableOpacity
+                style={[styles.modalButton, { backgroundColor: colors.primary }]}
+                onPress={handleUpdatePlayer}
+              >
+                <Text style={styles.modalButtonText}>Update Player</Text>
               </TouchableOpacity>
             </ScrollView>
           </View>
@@ -758,6 +1101,17 @@ const styles = StyleSheet.create({
   teamStatText: {
     fontSize: 14,
   },
+  teamActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  actionIconButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   playerCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -803,6 +1157,11 @@ const styles = StyleSheet.create({
   playerStatusText: {
     fontSize: 12,
     fontWeight: '600',
+  },
+  playerActions: {
+    flexDirection: 'column',
+    gap: 8,
+    marginLeft: 8,
   },
   addButton: {
     flexDirection: 'row',
