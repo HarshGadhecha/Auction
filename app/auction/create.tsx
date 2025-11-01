@@ -77,7 +77,7 @@ export default function CreateAuctionScreen() {
   const handlePickImage = async () => {
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
         aspect: [16, 9],
         quality: 0.8,
@@ -113,11 +113,7 @@ export default function CreateAuctionScreen() {
   };
 
   const validateForm = (): boolean => {
-    if (!formData.imageUrl) {
-      Alert.alert('Error', 'Please select an auction image');
-      //select default image
-      return false;
-    }
+    // Image is optional - default image will be used if not provided
     if (!formData.auctionName.trim()) {
       Alert.alert('Error', 'Please enter auction name');
       return false;
@@ -371,7 +367,7 @@ export default function CreateAuctionScreen() {
       </View>
 
       {/* Date & Time */}
-      <View style={!showDatePicker && !showTimePicker ? styles.inputGroup : {}}>
+      <View style={styles.inputGroup}>
         <Text style={[styles.label, { color: colors.text }]}>Auction Date & Time *</Text>
         <View style={styles.dateTimeRow}>
           <TouchableOpacity
