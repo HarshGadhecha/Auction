@@ -3,8 +3,8 @@ import React from 'react';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { useTheme } from '@/contexts/ThemeContext';
 import Colors from '@/constants/Colors';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function TabLayout() {
   const { isDark } = useTheme();

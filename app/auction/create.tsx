@@ -336,7 +336,7 @@ export default function CreateAuctionScreen() {
           </TouchableOpacity>
         </View>
       </View>
- {/* Date Picker Modals */}
+      {/* Date Picker Modals */}
       {showDatePicker && (
         <DateTimePicker
           value={auctionDate}
@@ -378,7 +378,7 @@ export default function CreateAuctionScreen() {
         </Text>
       </TouchableOpacity>
 
-     
+
     </ScrollView>
   );
 }
