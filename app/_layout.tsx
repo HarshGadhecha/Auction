@@ -11,10 +11,6 @@ import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 // Keep splash screen visible while loading
 SplashScreen.preventAutoHideAsync();
 
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
-
 function RootLayoutNav() {
   const { user, loading } = useAuth();
   const { isDark } = useTheme();
@@ -24,6 +20,10 @@ function RootLayoutNav() {
       SplashScreen.hideAsync();
     }
   }, [loading]);
+
+  if (loading) {
+    return null; // Keep splash screen visible while checking auth state
+  }
 
   return (
     <NavigationThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
